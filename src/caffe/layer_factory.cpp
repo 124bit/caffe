@@ -241,10 +241,13 @@ REGISTER_LAYER_CREATOR(TanH, GetTanHLayer);
 #ifdef WITH_PYTHON_LAYER
 template <typename Dtype>
 shared_ptr<Layer<Dtype> > GetPythonLayer(const LayerParameter& param) {
-  Py_Initialize();
+  // Py_Initialize();
   try {
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
     bp::object module = bp::import(param.python_param().module().c_str());
     bp::object layer = module.attr(param.python_param().layer().c_str())(param);
+    PyGILState_Release(gstate);
     return bp::extract<shared_ptr<PythonLayer<Dtype> > >(layer)();
   } catch (bp::error_already_set) {
     PyErr_Print();

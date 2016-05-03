@@ -15,6 +15,10 @@ namespace bp = boost::python;
 #include "caffe/caffe.hpp"
 #include "caffe/util/signal_handler.h"
 
+#ifdef WITH_PYTHON_LAYER
+#include "caffe/layers/python_layer.hpp"
+#endif
+
 using caffe::Blob;
 using caffe::Caffe;
 using caffe::Net;
@@ -400,6 +404,12 @@ int main(int argc, char** argv) {
       "  device_query    show GPU diagnostic information\n"
       "  time            benchmark model execution time");
   // Run tool or show usage.
+// TODO: if not multiple gpu don't init GIL here and in layer
+#ifdef WITH_PYTHON_LAYER
+  Py_InitializeEx(0);
+  caffe::prepare_python_threads();
+#endif
+
   caffe::GlobalInit(&argc, &argv);
   if (argc == 2) {
 #ifdef WITH_PYTHON_LAYER

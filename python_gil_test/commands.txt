@@ -1,0 +1,13 @@
+...activate python venv
+
+cd CAFFE_DIR
+export PYTHONPATH=$PWD/python_gil_test
+./build/tools/caffe train --solver=python_gil_test/custom_lenet_solver.prototxt
+python ./python_gil_test/net_test.py
+
+
+cd build
+cmake ..
+make all -j 3
+make pytest
+make runtest
